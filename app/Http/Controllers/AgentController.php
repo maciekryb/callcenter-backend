@@ -1,18 +1,16 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\Agent;
 use App\Services\AgentService;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 class AgentController extends Controller
 {
     public function __construct(protected AgentService $agentService) {}
 
-    public function store(Request $request)
+    public function create(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
