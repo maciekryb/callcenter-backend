@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Queue extends Model
 {
+
     use HasFactory;
 
 
@@ -17,6 +18,6 @@ class Queue extends Model
 
     public function agents()
     {
-        return $this->belongsToMany(Agent::class)->withPivot('efficiency')->withTimestamps();
+        return $this->belongsToMany(Agent::class, 'agent_queues')->withPivot('efficiency')->withTimestamps();
     }
 }

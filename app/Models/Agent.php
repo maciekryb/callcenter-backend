@@ -22,6 +22,6 @@ class Agent extends Model
 
     public function queues()
     {
-        return $this->belongsToMany(Queue::class)->withPivot('efficiency')->withTimestamps();
+        return $this->belongsToMany(Queue::class, 'agent_queues')->withPivot('efficiency')->withTimestamps();
     }
 }
