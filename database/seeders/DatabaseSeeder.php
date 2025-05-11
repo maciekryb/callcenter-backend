@@ -17,6 +17,6 @@ class DatabaseSeeder extends Seeder
         $this->call(QueueSeeder::class);
        Agent::factory()->withQueues()->count(5)->create();
 
-        // $this->call(AgentAvailabilitySeeder::class);
+        $this->call(AgentAvailabilitySeeder::class);
     }
 }

@@ -21,18 +21,31 @@ class AgentAvailabilitySeeder extends Seeder
 
                 // Przykładowe godziny dostępności (losowe okno przez cały dzien)
                 $lengthInHours = rand(1, 24); //czas dyżuru
-                $maxLengthInHours = 24 - $lengthInHours; // do której godziny maksymalnie można przydzielić dyżur
-                $startHour = rand(0, $maxLengthInHours);
-                $endHour = $startHour + $lengthInHours; // 4–8 godzin zmiany
-
-                DB::table('agent_availability')->insert([
-                    'agent_id' => $agent->id,
-                    'date' => $date->toDateString(),
-                    'start_time' => Carbon::createFromTime($startHour)->format('H'),
-                    'end_time' => Carbon::createFromTime($endHour)->format('H'),
-                    'notes' => null,
-                    'created_at' => now(),
-                ]);
+                if ($lengthInHours === 24) {
+                    $isAllDay = true; // dyżur całodobowy
+                    DB::table('agent_availability')->insert([
+                        'agent_id' => $agent->id,
+                        'date' => $date->toDateString(),
+                        'all_day' => $isAllDay,
+                        'start_time' => Carbon::createFromTime(0)->format('H:i:s'),
+                        'end_time' => Carbon::createFromTime(0)->format('H:i:s'),
+                        'notes' => null,
+                        'created_at' => now(),
+                    ]);
+                } else {
+                    $maxLengthInHours = 24 - $lengthInHours; // do której godziny maksymalnie można przydzielić dyżur
+                    $startHour = rand(0, $maxLengthInHours);
+                    $endHour = $startHour + $lengthInHours; // 4–8 godzin zmiany
+                    DB::table('agent_availability')->insert([
+                        'agent_id' => $agent->id,
+                        'date' => $date->toDateString(),
+                        'all_day' => false,
+                        'start_time' => Carbon::createFromTime($startHour)->format('H:i:s'),
+                        'end_time' => Carbon::createFromTime($endHour)->format('H:i:s'),
+                        'notes' => null,
+                        'created_at' => now(),
+                    ]);
+                }
             }
         }
     }

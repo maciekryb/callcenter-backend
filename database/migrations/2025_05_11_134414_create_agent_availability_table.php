@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('agent_id')->constrained('agents')->onDelete('cascade');
             $table->date('date');
+             $table->boolean('all_day')->default(false);
+            $table->time('start_time');
             $table->time('end_time');
             $table->text('notes')->nullable();
             $table->timestamps();
