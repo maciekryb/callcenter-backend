@@ -23,7 +23,7 @@ class AgentAvailabilitySeeder extends Seeder
                 $lengthInHours = rand(1, 24); //czas dyżuru
                 if ($lengthInHours === 24) {
                     $isAllDay = true; // dyżur całodobowy
-                    DB::table('agent_availability')->insert([
+                    DB::table('agent_availabilities')->insert([
                         'agent_id' => $agent->id,
                         'date' => $date->toDateString(),
                         'all_day' => $isAllDay,
@@ -36,7 +36,7 @@ class AgentAvailabilitySeeder extends Seeder
                     $maxLengthInHours = 24 - $lengthInHours; // do której godziny maksymalnie można przydzielić dyżur
                     $startHour = rand(0, $maxLengthInHours);
                     $endHour = $startHour + $lengthInHours; // 4–8 godzin zmiany
-                    DB::table('agent_availability')->insert([
+                    DB::table('agent_availabilities')->insert([
                         'agent_id' => $agent->id,
                         'date' => $date->toDateString(),
                         'all_day' => false,
