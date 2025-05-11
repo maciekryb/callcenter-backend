@@ -14,7 +14,7 @@ return new class extends Migration
     {
         Schema::create('queues', function (Blueprint $table) {
             $table->id();
-            $table->enum('type', Queue::validTypes);
+            $table->string('name')->notNullable();
             $table->timestamps();
         });
     }
