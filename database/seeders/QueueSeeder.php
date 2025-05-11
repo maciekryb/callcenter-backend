@@ -14,10 +14,10 @@ class QueueSeeder extends Seeder
     {
         // Dodajemy przykładowe dane do tabeli 'queues'
         DB::table('queues')->insert([
-            ['name' => 'general', 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'sales', 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'resales', 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'technical_support', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Ogólna', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Sprzedaż', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Do sprzedaż', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Pomoc techniczna', 'created_at' => now(), 'updated_at' => now()],
         ]);
     }
 }
