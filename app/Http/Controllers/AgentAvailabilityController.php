@@ -29,12 +29,16 @@ class AgentAvailabilityController extends Controller
         return response()->json($schedules);
     }
 
-    public function getAgentsScheduleByQueueId($id)
+    public function getAgentsScheduleByQueueId( $id)
     {
+        $validated = validator(['id' => $id], [
+            'id' => 'required|integer|exists:queues,id',
+        ])->validate();
+
         $startDate = now()->startOfWeek();
         $endDate = now()->endOfWeek();
 
-        $schedules = AgentAvailability::getAgentsScheduleByQueueId($id, $startDate, $endDate);
+        $schedules = AgentAvailability::getAgentsScheduleByQueueId($validated['id'], $startDate, $endDate);
 
         return response()->json($schedules);
     }
