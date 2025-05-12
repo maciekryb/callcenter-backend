@@ -9,9 +9,9 @@ class AgentAvailability extends Model
 {
     use HasFactory;
 
-    const AVAILABILITY_FULL_DAY = "full day";
-    const AVAILABILITY_PARTIAL_DAY = "partial day";
-    const AVAILABILITY_NOT_AVAILABLE = "not available";
+    const AVAILABILITY_FULL_DAY = "full_day";
+    const AVAILABILITY_PARTIAL_DAY = "partial_day";
+    const AVAILABILITY_NOT_AVAILABLE = "not_available";
 
     const validAvailabilityStatus = [
         self::AVAILABILITY_FULL_DAY,
