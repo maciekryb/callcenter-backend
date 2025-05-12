@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class AgentAvailability extends Model
 {
@@ -21,6 +22,55 @@ class AgentAvailability extends Model
 
     public static function getAllAgentScheduleForDateRange($startDate, $endDate)
     {
-        return self::whereBetween('date', [$startDate, $endDate])->get();
+        $schedules = self::with(['agent.queues'])
+            ->whereBetween('date', [$startDate, $endDate])
+            ->get();
+
+        // Usuń pole pivot z każdej kolejki agenta
+        return $schedules->map(function ($availability) {
+            if ($availability->agent && $availability->agent->queues) {
+                $availability->agent->queues = $availability->agent->queues->map(function ($queue) {
+                    unset($queue["pivot"]);
+                    return $queue;
+                });
+            }
+            return $availability;
+        });
+    }
+
+    public static function getAgentsScheduleByQueueId($id, $startDate, $endDate)
+    {
+
+        $agentIds = DB::table('agent_queues')
+            ->where('queue_id', $id)
+            ->pluck('agent_id');
+
+        $schedules = self::with(['agent.queues' => function () {}])
+            ->whereBetween('date', [$startDate, $endDate])
+            ->whereIn('agent_id', $agentIds)
+            ->get();
+
+        logger($schedules);
+
+        $schedules = $schedules->map(function ($availability) {
+            if ($availability->agent && $availability->agent->queues) {
+                $availability->agent->queues = $availability->agent->queues->map(function ($queue) {
+                    unset($queue["pivot"]);
+                    return $queue;
+                });
+            }
+            return $availability;
+        });
+        return $schedules;
+    }
+
+    public static function getQueueById($id)
+    {
+        return \App\Models\Queue::find($id);
+    }
+
+    public function agent()
+    {
+        return $this->belongsTo(Agent::class, 'agent_id');
     }
 }

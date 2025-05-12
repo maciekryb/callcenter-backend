@@ -9,5 +9,6 @@ Route::post('agents', [AgentController::class, 'create']);  // Tworzymy agenta
 
 Route::get('queues', [QueueController::class, 'getQueues']); // Pobieramy wszystkie kolejki
 
-
 Route::get('agent/schedule', [AgentAvailabilityController::class, 'getAllAgentsSchedule']); // Pobieramy grafik dla wszystkich agentów
+
+Route::get('queue/{id}/agents-schedule', [AgentAvailabilityController::class, 'getAgentsScheduleByQueueId']); // Pobieramy grafik agentów dla danej kolejki po id

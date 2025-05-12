@@ -11,15 +11,30 @@ class AgentAvailabilityController extends Controller
 {
     public function getAllAgentsSchedule(Request $request)
     {
-        // Pobierz daty z zapytania
-        // $startDate = $request->input('start_date');
-        // $endDate = $request->input('end_date');
-
         $startDate =  now()->startOfWeek();
         $endDate =  now()->endOfWeek();
 
-        // Pobierz grafik agentów dla zakresu dat
         $schedules = AgentAvailability::getAllAgentScheduleForDateRange($startDate, $endDate);
+
+        $schedules = $schedules->map(function ($availability) {
+            if ($availability->agent && $availability->agent->queues) {
+                $availability->agent->queues = $availability->agent->queues->map(function ($queue) {
+                    unset($queue["pivot"]);
+                    return $queue;
+                });
+            }
+            return $availability;
+        });
+
+        return response()->json($schedules);
+    }
+
+    public function getAgentsScheduleByQueueId($id)
+    {
+        $startDate = now()->startOfWeek();
+        $endDate = now()->endOfWeek();
+
+        $schedules = AgentAvailability::getAgentsScheduleByQueueId($id, $startDate, $endDate);
 
         return response()->json($schedules);
     }
