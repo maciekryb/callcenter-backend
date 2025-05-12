@@ -16,16 +16,6 @@ class AgentAvailabilityController extends Controller
 
         $schedules = AgentAvailability::getAllAgentScheduleForDateRange($startDate, $endDate);
 
-        $schedules = $schedules->map(function ($availability) {
-            if ($availability->agent && $availability->agent->queues) {
-                $availability->agent->queues = $availability->agent->queues->map(function ($queue) {
-                    unset($queue["pivot"]);
-                    return $queue;
-                });
-            }
-            return $availability;
-        });
-
         return response()->json($schedules);
     }
 
