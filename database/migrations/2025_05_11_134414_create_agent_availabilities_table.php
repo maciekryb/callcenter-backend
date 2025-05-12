@@ -15,8 +15,8 @@ return new class extends Migration
         Schema::create('agent_availabilities', function (Blueprint $table) {
             $table->id();
             $table->foreignId('agent_id')->constrained('agents')->onDelete('cascade');
-            $table->date('date');
             $table->enum('availability_status', AgentAvailability::validAvailabilityStatus);
+            $table->date('date');
             $table->time('start_time');
             $table->time('end_time');
             $table->text('notes')->nullable();
