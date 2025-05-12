@@ -15,6 +15,7 @@ return new class extends Migration
         Schema::create('work_load_predictions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('queue_id')->constrained('queues')->onDelete('cascade');
+            $table->integer('phone_calls_per_hour')->default(0);
             $table->date('date');
             $table->time('start_hour')->nullable();
             $table->timestamps();
