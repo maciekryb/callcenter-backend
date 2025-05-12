@@ -17,8 +17,8 @@ return new class extends Migration
             $table->foreignId('agent_id')->constrained('agents')->onDelete('cascade');
             $table->enum('availability_status', AgentAvailability::validAvailabilityStatus);
             $table->date('date');
-            $table->time('start_time');
-            $table->time('end_time');
+            $table->time('start_time')->nullable();
+            $table->time('end_time')->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();
         });
