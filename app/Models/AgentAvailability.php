@@ -20,27 +20,9 @@ class AgentAvailability extends Model
         self::AVAILABILITY_NOT_AVAILABLE,
     ];
 
-    public static function getAllAgentScheduleForDateRange($startDate, $endDate)
-    {
-        $schedules = self::with(['agent.queues'])
-            ->whereBetween('date', [$startDate, $endDate])
-            ->get();
-
-        // Usuń pole pivot z każdej kolejki agenta
-        return $schedules->map(function ($availability) {
-            if ($availability->agent && $availability->agent->queues) {
-                $availability->agent->queues = $availability->agent->queues->map(function ($queue) {
-                    unset($queue["pivot"]);
-                    return $queue;
-                });
-            }
-            return $availability;
-        });
-    }
 
     public static function getAgentsScheduleByQueueId($id, $startDate, $endDate)
     {
-
         $agentIds = DB::table('agent_queues')
             ->where('queue_id', $id)
             ->pluck('agent_id');
@@ -50,7 +32,6 @@ class AgentAvailability extends Model
             ->whereIn('agent_id', $agentIds)
             ->get();
 
-        logger($schedules);
 
         $schedules = $schedules->map(function ($availability) {
             if ($availability->agent && $availability->agent->queues) {
@@ -62,11 +43,6 @@ class AgentAvailability extends Model
             return $availability;
         });
         return $schedules;
-    }
-
-    public static function getQueueById($id)
-    {
-        return \App\Models\Queue::find($id);
     }
 
     public function agent()
