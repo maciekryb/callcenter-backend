@@ -65,8 +65,8 @@ class AgentAvailabilitySeeder extends Seeder
             AgentAvailability::AVAILABILITY_NOT_AVAILABLE,
         ];
 
-        // 70% szans na PARTIAL_DAY, 15% na FULL_DAY, 15% na OFF
-        $weights = [70, 15, 15];
+        // 80% szans na PARTIAL_DAY, 10% na FULL_DAY, 10% na OFF
+        $weights = [70, 10, 20];
         $random = rand(1, 100);
 
         $cumulative = 0;

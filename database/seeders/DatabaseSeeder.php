@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(QueueSeeder::class);
-       Agent::factory()->withQueues()->count(5)->create();
+       Agent::factory()->withQueues()->count(10)->create();
 
         $this->call(AgentAvailabilitySeeder::class);
     }
