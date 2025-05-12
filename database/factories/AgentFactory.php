@@ -12,8 +12,12 @@ class AgentFactory extends Factory
 
     public function definition()
     {
+        $faker = \Faker\Factory::create('pl_PL');
+        $fullName = $faker->firstName . ' ' . $faker->lastName;
+        $fullName = mb_substr($fullName, 0, 20);
+
         return [
-            'name' => $this->faker->name,
+            'name' => $fullName,
             'email' => $this->faker->unique()->safeEmail,
         ];
     }
