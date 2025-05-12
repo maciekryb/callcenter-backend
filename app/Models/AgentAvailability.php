@@ -9,6 +9,16 @@ class AgentAvailability extends Model
 {
     use HasFactory;
 
+    const AVAILABILITY_FULL_DAY = "full day";
+    const AVAILABILITY_PARTIAL_DAY = "partial day";
+    const AVAILABILITY_NOT_AVAILABLE = "not available";
+
+    const validAvailabilityStatus = [
+        self::AVAILABILITY_FULL_DAY,
+        self::AVAILABILITY_PARTIAL_DAY,
+        self::AVAILABILITY_NOT_AVAILABLE,
+    ];
+
     public static function getAllAgentScheduleForDateRange($startDate, $endDate)
     {
         return self::whereBetween('date', [$startDate, $endDate])->get();
