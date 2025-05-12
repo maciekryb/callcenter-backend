@@ -6,7 +6,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Models\Agent;
-use App\Models\AgentAvailability; // Upewnij się, że masz model AgentAvailability
+use App\Models\AgentAvailability;
 
 class AgentAvailabilitySeeder extends Seeder
 {
@@ -16,15 +16,15 @@ class AgentAvailabilitySeeder extends Seeder
         $today = Carbon::today();
 
         foreach ($agents as $agent) {
-            $insertData = []; // Przygotowanie danych do grupowego wstawienia
+            $insertData = [];
 
             for ($i = 0; $i < 6; $i++) {
                 $date = $today->copy()->addDays($i);
                 $availabilityStatus = $this->getRandomAvailabilityStatus();
 
                 if ($availabilityStatus === AgentAvailability::AVAILABILITY_PARTIAL_DAY) {
-                    $lengthInHours = rand(1, 23); //czas dyżuru
-                    $maxLengthInHours = 24 - $lengthInHours; // do której godziny maksymalnie można przydzielić dyżur
+                    $lengthInHours = rand(1, 23);
+                    $maxLengthInHours = 24 - $lengthInHours;
                     $startHour = rand(0, $maxLengthInHours);
                     $endHour = $startHour + $lengthInHours;
                     $insertData[] = [
@@ -49,14 +49,10 @@ class AgentAvailabilitySeeder extends Seeder
                 }
             }
 
-            // Grupowe wstawienie danych
             DB::table('agent_availabilities')->insert($insertData);
         }
     }
 
-    /**
-     * Losuje typ dostępności z większym prawdopodobieństwem dla AVAILABILITY_PARTIAL_DAY.
-     */
     private function getRandomAvailabilityStatus(): string
     {
         $statuses = [
@@ -65,7 +61,7 @@ class AgentAvailabilitySeeder extends Seeder
             AgentAvailability::AVAILABILITY_NOT_AVAILABLE,
         ];
 
-        // 80% szans na PARTIAL_DAY, 10% na FULL_DAY, 10% na OFF
+        // 70% szans na PARTIAL_DAY, 10% na FULL_DAY, 20% na OFF
         $weights = [70, 10, 20];
         $random = rand(1, 100);
 
@@ -77,6 +73,6 @@ class AgentAvailabilitySeeder extends Seeder
             }
         }
 
-        return AgentAvailability::AVAILABILITY_PARTIAL_DAY; // Domyślnie PARTIAL_DAY
+        return AgentAvailability::AVAILABILITY_PARTIAL_DAY;
     }
 }
