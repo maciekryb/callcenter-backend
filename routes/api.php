@@ -12,4 +12,4 @@ Route::get('queues', [QueueController::class, 'getQueues']); // Pobieramy wszyst
 
 Route::get('queue/{id}/agents-schedule', [AgentAvailabilityController::class, 'getAgentsScheduleByQueueId']); // Pobieramy grafik agentów dla danej kolejki po id
 
-Route::get('queue/{id}/work-load', [WorkLoadPredictionController::class, 'getWorkLoadPrediction']); // Pobieramy prognozę obciążenia dla danej kolejki po id
+Route::get('queue/{id}/work-load', [WorkLoadPredictionController::class, 'getWorkLoadPredictionByQueueId']); // Pobieramy prognozę obciążenia dla danej kolejki po id

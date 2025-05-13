@@ -7,7 +7,7 @@ use App\Models\WorkLoadPrediction;
 
 class WorkLoadPredictionController extends Controller
 {
-    public function getAgentsScheduleByQueueId($id)
+    public function getWorkLoadPredictionByQueueId($id)
     {
         $validated = validator(['id' => $id], [
             'id' => 'required|integer|exists:queues,id',
