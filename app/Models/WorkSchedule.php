@@ -9,6 +9,14 @@ class WorkSchedule extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'agent_id',
+        'queue_id',
+        'date',
+        'start_time',
+        'end_time',
+    ];
+
     const AVAILABILITY_FULL_DAY = "full_day";
     const AVAILABILITY_PARTIAL_DAY = "partial_day";
 
