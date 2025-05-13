@@ -11,7 +11,7 @@ class WorkLoadPredictionSeeder extends Seeder
     public function run(): void
     {
         $queues = DB::table('queues')->pluck('id');
-        $today = Carbon::today();
+        $today = now()->startOfWeek();
 
         foreach ($queues as $queueId) {
             for ($day = 0; $day < 6; $day++) {

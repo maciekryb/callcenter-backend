@@ -13,7 +13,7 @@ class AgentAvailabilitySeeder extends Seeder
     public function run(): void
     {
         $agents = Agent::all();
-        $today = Carbon::today();
+        $today = now()->startOfWeek();
 
         foreach ($agents as $agent) {
             $insertData = [];
