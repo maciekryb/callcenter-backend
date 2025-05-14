@@ -29,7 +29,7 @@ class AgentFactory extends Factory
 
             foreach ($queues as $queueId) {
                 $agent->queues()->attach($queueId, [
-                    'efficiency' => $this->faker->randomFloat(2, 0.4, 1.0),
+                    'efficiency' => $this->faker->numberBetween(10, 20),
                 ]);
             }
         });

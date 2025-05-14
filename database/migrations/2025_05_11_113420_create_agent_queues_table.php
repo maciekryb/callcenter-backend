@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('agent_id')->constrained()->onDelete('cascade');
             $table->foreignId('queue_id')->constrained()->onDelete('cascade');
-            $table->float('efficiency')->default(1.0); // Indywidualna efektywność agenta na tej kolejce
+            $table->integer('efficiency');
             $table->timestamps();
         });
     }
