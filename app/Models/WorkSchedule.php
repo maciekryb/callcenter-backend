@@ -24,4 +24,9 @@ class WorkSchedule extends Model
         self::AVAILABILITY_FULL_DAY,
         self::AVAILABILITY_PARTIAL_DAY,
     ];
+
+    public function agent()
+    {
+        return $this->belongsTo(Agent::class, 'agent_id');
+    }
 }

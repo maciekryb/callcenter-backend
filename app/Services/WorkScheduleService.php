@@ -15,11 +15,23 @@ class WorkScheduleService
     public function getWorkScheduleByQueueId($id, $startDate, $endDate)
     {
         // Pobierz grafik agentów dla danej kolejki po id
-        $workSchedule = WorkSchedule::where('queue_id', $id)
-            ->whereBetween('date', [$startDate, $endDate])
-            ->get();
+      $workSchedule = WorkSchedule::with('agent')
+        ->where('queue_id', $id)
+        ->whereBetween('date', [$startDate, $endDate])
+        ->get()
+        ->map(function ($ws) {
+            return [
+                'id' => $ws->id,
+                'agent_id' => $ws->agent_id,
+                'agent_name' => $ws->agent ? $ws->agent->name : null,
+                'queue_id' => $ws->queue_id,
+                'date' => $ws->date,
+                'start_time' => $ws->start_time,
+                'end_time' => $ws->end_time,
+            ];
+        });
 
-            logger($workSchedule);
+    logger($workSchedule);
         return $workSchedule;
     }
 
@@ -232,51 +244,4 @@ class WorkScheduleService
         return $results;
     }
 
-    /**
-     * Grupuje grafik pracy po agencie i dacie, łącząc kolejne godziny w bloki.
-     * Zwraca: [agent_id => [date => [[start_time, end_time, work_status], ...]]]
-     */
-    public static function groupWorkScheduleByAgentAndDate($workSchedule)
-    {
-        $result = [];
-        foreach ($workSchedule as $row) {
-            $agentId = $row['agent_id'] ?? $row->agent_id;
-            $date = $row['date'] ?? $row->date;
-            $start = $row['start_time'] ?? $row->start_time;
-            $end = $row['end_time'] ?? $row->end_time;
-
-            $result[$agentId][$date][] = [
-                'start_time' => $start,
-                'end_time' => $end,
-            ];
-        }
-
-        // Łączenie bloków godzinowych w ciągłe zakresy
-        foreach ($result as $agentId => $dates) {
-            foreach ($dates as $date => $slots) {
-                usort($slots, function($a, $b) {
-                    return strcmp($a['start_time'], $b['start_time']);
-                });
-                $blocks = [];
-                foreach ($slots as $slot) {
-                    if (empty($blocks)) {
-                        $blocks[] = $slot;
-                    } else {
-                        $last = &$blocks[count($blocks)-1];
-                        // Jeśli status ten sam i godziny się łączą, scal
-                        if (
-                            $last['work_status'] === $slot['work_status'] &&
-                            $last['end_time'] === $slot['start_time']
-                        ) {
-                            $last['end_time'] = $slot['end_time'];
-                        } else {
-                            $blocks[] = $slot;
-                        }
-                    }
-                }
-                $result[$agentId][$date] = $blocks;
-            }
-        }
-        return $result;
-    }
 }
