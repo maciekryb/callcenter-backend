@@ -1,66 +1,135 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# System Zarządzania Grafikiem
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Opis projektu
 
-## About Laravel
+System do zarządzania grafikami agentów Call Center w firmie telekomunikacyjnej. Pozwala na optymalne układanie grafików pracy agentów w oparciu o:
+- prognozy zapotrzebowania na połączenia w poszczególnych kolejkach,
+- indywidualne umiejętności i wydajność agentów (liczba obsługiwanych połączeń na godzinę),
+- dostępność agentów (pełny dzień, część dnia, niedostępność),
+- elastyczne godziny pracy i obsługę wielu kolejek przez jednego agenta.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Projekt zawiera backend (Laravel) oraz frontend (osobny projekt – patrz niżej).
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Wymagania
+- PHP >= 8.1
+- Composer
+- MySQL lub inna baza obsługiwana przez Laravel
+- Node.js (jeśli chcesz uruchomić frontend)
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Instalacja backendu (Laravel)
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+1. **Klonowanie repozytorium**
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```bash
+# Skopiuj repozytorium do wybranego katalogu
+$ git clone <adres-repo>
+$ cd callcenter-backend
+```
 
-## Laravel Sponsors
+2. **Instalacja zależności**
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```bash
+$ composer install
+```
 
-### Premium Partners
+3. **Konfiguracja środowiska**
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+Skopiuj plik `.env.example` do `.env` i ustaw dane dostępowe do bazy:
 
-## Contributing
+```bash
+$ cp .env.example .env
+$ php artisan key:generate
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Ustaw w `.env`:
+```
+DB_DATABASE=callcenter
+DB_USERNAME=your_user
+DB_PASSWORD=your_password
+```
 
-## Code of Conduct
+4. **Migracje**
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Uruchom migracje, aby utworzyć wszystkie tabele w bazie danych:
 
-## Security Vulnerabilities
+```bash
+$ php artisan migrate
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+5. **Seedy (przykładowe dane)**
 
-## License
+Seedy wypełniają bazę przykładowymi danymi:
+- Tworzą 4 kolejki tematyczne (np. sprzedaż, do sprzedaż, wsparcie techniczne, ogólna).
+- Tworzą przykładowe prognozy obciążenia (liczba połączeń na godzinę dla każdej kolejki).
+- Tworzą 20 przykładowych agentów (pracowników call center).
+- Przypisują agentów do kolejek wraz z ich wydajnością (liczba połączeń/h).
+- Generują przykładowe dostępności agentów na najbliższe dni (pełny dzień, zakres godzin, niedostępność).
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Aby uruchomić seedy:
+
+```bash
+$ php artisan db:seed
+```
+
+6. **Uruchomienie serwera developerskiego**
+
+```bash
+$ php artisan serve
+```
+
+Backend będzie dostępny domyślnie pod adresem: http://127.0.0.1:8000
+
+---
+
+## API
+
+Stworzone endpointy (patrz `routes/api.php`).
+*Uwaga: W celach demonstracyjnych wszystkie operacje dotyczą danych w ujęciu jednego tygodnia*
+
+- `POST /api/agents`  
+  Tworzy nowego agenta wraz z przypisaniem do kolejek i wydajnością.
+
+- `GET /api/queues`  
+  Zwraca listę wszystkich kolejek tematycznych.
+
+- `GET /api/queue/{id}/agents-schedule`  
+  Zwraca grafik dostępności agentów dla wybranej kolejki (na podstawie dostępności, nie docelowego grafiku pracy) – dla całego tygodnia.
+
+- `GET /api/queue/{id}/work-load`  
+  Zwraca prognozę obciążenia (liczbę połączeń na godzinę) dla wybranej kolejki – dla całego tygodnia.
+
+- `GET /api/work-schedule/queue/{id}`  
+  Zwraca docelowy grafik pracy agentów dla wybranej kolejki (na podstawie wygenerowanego harmonogramu) – dla całego tygodnia.
+
+- `POST /api/work-schedule/generate`  
+  Generuje grafik pracy agentów na podstawie prognoz, dostępności i wydajności (uruchamia algorytm optymalizujący grafik) – dla całego tygodnia.
+
+---
+
+## Frontend
+
+Projekt frontendowy znajduje się w osobnym repozytorium i został zbudowany w technologii **React + Vite + Tailwind CSS**.
+- **Repozytorium:** `<adres-repo-frontend>`
+- **Instrukcja uruchomienia:** patrz README w repozytorium frontendu
+
+Frontend komunikuje się z backendem przez powyższe endpointy REST API.
+
+---
+
+## Najważniejsze założenia i logika
+- Agenci mogą obsługiwać wiele kolejek, każda z indywidualną wydajnością (liczba połączeń/h).
+- System generuje grafik na podstawie prognoz i dostępności agentów, optymalizując pokrycie zapotrzebowania.
+- Algorytm najpierw obsadza godziny z największym ruchem.
+- Przykładowe dane generowane są przez seedery.
+
+---
+
+## Uruchomienie całości (backend + frontend)
+1. Uruchom backend według powyższej instrukcji.
+2. Uruchom frontend według instrukcji w repozytorium frontendu.
+3. Upewnij się, że adresy API w frontendzie wskazują na backend (np. http://localhost:8000/api).
+
