@@ -16,3 +16,4 @@ Route::get('queue/{id}/agents-schedule', [AgentAvailabilityController::class, 'g
 Route::get('queue/{id}/work-load', [WorkLoadPredictionController::class, 'getWorkLoadPredictionByQueueId']); // Pobieramy prognozę obciążenia dla danej kolejki po id
 
 Route::get('work-schedule/queue/{id}', [WorkScheduleController::class, 'getWorkScheduleByQueueId']); // Pobieramy grafik agentów dla danej kolejki po id
+Route::post('work-schedule/generate', [WorkScheduleController::class, 'createWorkSchedule']); // Generujemy grafik agentów

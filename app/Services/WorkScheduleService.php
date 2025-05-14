@@ -31,7 +31,6 @@ class WorkScheduleService
                 ];
             });
 
-        logger($workSchedule);
         return $workSchedule;
     }
 
@@ -145,7 +144,7 @@ class WorkScheduleService
             DB::rollBack();
             throw $e;
         }
-        return $results;
+        return 'Grafik został utworzony pomyślnie';
     }
 
     public static function createWorkSchedule2($date)
@@ -230,8 +229,6 @@ class WorkScheduleService
 
     public static function createWorkSchedule1($date)
     {
-
-        logger('pobieram kolejki');
         $queues = Queue::all();
         $results = [];
         $agentHourAssignments = [];

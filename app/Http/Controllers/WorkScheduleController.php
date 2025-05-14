@@ -9,12 +9,12 @@ class WorkScheduleController extends Controller
 {
     public function __construct(protected WorkScheduleService $workScheduleService) {}
 
-    public function create()
+    public function createWorkSchedule()
     {
         $date = now()->startOfWeek();
-        $agent = $this->workScheduleService->createWorkSchedule($date);
+        $schedule = $this->workScheduleService->createWorkScheduleForWeek($date);
 
-        return response()->json($agent, 201);
+        return response()->json($schedule, 201);
     }
 
     public function getWorkScheduleByQueueId($id)
