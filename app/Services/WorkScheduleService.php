@@ -15,23 +15,23 @@ class WorkScheduleService
     public function getWorkScheduleByQueueId($id, $startDate, $endDate)
     {
         // Pobierz grafik agentów dla danej kolejki po id
-      $workSchedule = WorkSchedule::with('agent')
-        ->where('queue_id', $id)
-        ->whereBetween('date', [$startDate, $endDate])
-        ->get()
-        ->map(function ($ws) {
-            return [
-                'id' => $ws->id,
-                'agent_id' => $ws->agent_id,
-                'agent_name' => $ws->agent ? $ws->agent->name : null,
-                'queue_id' => $ws->queue_id,
-                'date' => $ws->date,
-                'start_time' => $ws->start_time,
-                'end_time' => $ws->end_time,
-            ];
-        });
+        $workSchedule = WorkSchedule::with('agent')
+            ->where('queue_id', $id)
+            ->whereBetween('date', [$startDate, $endDate])
+            ->get()
+            ->map(function ($ws) {
+                return [
+                    'id' => $ws->id,
+                    'agent_id' => $ws->agent_id,
+                    'agent_name' => $ws->agent ? $ws->agent->name : null,
+                    'queue_id' => $ws->queue_id,
+                    'date' => $ws->date,
+                    'start_time' => $ws->start_time,
+                    'end_time' => $ws->end_time,
+                ];
+            });
 
-    logger($workSchedule);
+        logger($workSchedule);
         return $workSchedule;
     }
 
@@ -49,6 +49,107 @@ class WorkScheduleService
     // Przydzielaj agentów do kolejki, aż suma ich efektywności pokryje zapotrzebowanie (lub do wyczerpania dostępnych).
     // Dla każdego przydzielonego agenta:
     // Zapisz wpis do work_schedules z odpowiednim work_status (full_day/partial_day).
+
+    public static function createWorkSchedule($date)
+    {
+        $queues = Queue::all();
+        $results = [];
+        $agentHourAssignments = [];
+        DB::beginTransaction();
+        try {
+            foreach ($queues as $queue) {
+                // Pobierz prognozy obciążenia na dany dzień dla tej kolejki
+                $predictions = WorkLoadPrediction::where('queue_id', $queue->id)
+                    ->where('date', $date)
+                    ->orderBy('start_hour')
+                    ->get();
+
+                // Pobierz agentów obsługujących tę kolejkę wraz z efektywnością (liczba połączeń/h)
+                $agents = $queue->agents()->get();
+                $agentEff = [];
+                foreach ($agents as $agent) {
+                    $agentEff[$agent->id] = $agent->pivot->efficiency;
+                }
+
+                // Pobierz dostępności agentów na ten dzień
+                $availabilities = AgentAvailability::whereIn('agent_id', $agents->pluck('id'))
+                    ->where('date', $date)
+                    ->get()
+                    ->groupBy('agent_id');
+
+                // Przygotuj tablicę godzin z zapotrzebowaniem
+                $hourlyNeed = [];
+                foreach ($predictions as $prediction) {
+                    $hour = (int)substr($prediction->start_hour, 0, 2);
+                    $hourlyNeed[$hour] = $prediction->phone_calls_per_hour;
+                }
+
+                // Sortuj godziny malejąco po zapotrzebowaniu
+                arsort($hourlyNeed);
+
+                // Dla każdej godziny (od największego zapotrzebowania)
+                foreach ($hourlyNeed as $hour => $callsNeeded) {
+                    // Filtruj dostępnych agentów na tę godzinę
+                    $availableAgents = [];
+                    foreach ($agents as $agent) {
+                        $a = $availabilities[$agent->id][0] ?? null;
+                        if (!$a) continue;
+                        if ($a->availability_status === AgentAvailability::AVAILABILITY_NOT_AVAILABLE) continue;
+                        if ($a->availability_status === AgentAvailability::AVAILABILITY_FULL_DAY) {
+                            $availableAgents[] = $agent;
+                        } elseif ($a->availability_status === AgentAvailability::AVAILABILITY_PARTIAL_DAY) {
+                            if ($a->start_time && $a->end_time && $hour >= (int)substr($a->start_time, 0, 2) && $hour < (int)substr($a->end_time, 0, 2)) {
+                                $availableAgents[] = $agent;
+                            }
+                        }
+                    }
+
+                    // Dla każdego dostępnego agenta policz efektywność z uwzględnieniem liczby kolejek w tej godzinie
+                    $agentEffective = [];
+                    foreach ($availableAgents as $agent) {
+                        $effDiv = ($agentHourAssignments[$agent->id][$hour] ?? 0) + 1;
+                        $effectiveEff = $agentEff[$agent->id] / $effDiv;
+                        if ($effectiveEff > 0) {
+                            $agentEffective[] = [
+                                'agent' => $agent,
+                                'effectiveEff' => $effectiveEff
+                            ];
+                        }
+                    }
+
+                    // Sortuj agentów malejąco po efektywności
+                    usort($agentEffective, function ($a, $b) {
+                        return $b['effectiveEff'] <=> $a['effectiveEff'];
+                    });
+
+                    $callsLeft = $callsNeeded;
+                    foreach ($agentEffective as $item) {
+                        if ($callsLeft <= 0) break;
+                        $agent = $item['agent'];
+                        $eff = $item['effectiveEff'];
+
+                        // Przypisz agenta do tej godziny
+                        WorkSchedule::updateOrCreate([
+                            'queue_id' => $queue->id,
+                            'agent_id' => $agent->id,
+                            'date' => $date,
+                            'start_time' => sprintf('%02d:00:00', $hour),
+                        ], [
+                            'end_time' => sprintf('%02d:00:00', $hour + 1),
+                        ]);
+                        $results[] = [$queue->id, $agent->id, $date, $hour];
+                        $callsLeft -= $eff;
+                        $agentHourAssignments[$agent->id][$hour] = ($agentHourAssignments[$agent->id][$hour] ?? 0) + 1;
+                    }
+                }
+            }
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+        return $results;
+    }
 
     public static function createWorkSchedule2($date)
     {
@@ -130,7 +231,7 @@ class WorkScheduleService
     // Ciągłość zmian – przydzielamy agentów do bloków godzin, nie pojedynczych godzin.
     // Unikamy dziur w grafiku – agent powinien mieć zmiany w jednym kawałku, nie rozrzucone po całym dniu.
 
-    public static function createWorkSchedule($date)
+    public static function createWorkSchedule1($date)
     {
 
         logger('pobieram kolejki');
@@ -243,5 +344,4 @@ class WorkScheduleService
         }
         return $results;
     }
-
 }
