@@ -33,7 +33,7 @@ class createWorkSchedule extends Command
         $date = now()->startOfWeek();
 
         $this->info('Creating work schedule for date: ' . $date);
-        WorkScheduleService::createWorkSchedule($date);
+        WorkScheduleService::createWorkScheduleForWeek($date);
 
         $this->info('Work schedule created successfully.');
     }
