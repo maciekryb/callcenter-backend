@@ -16,4 +16,14 @@ class WorkScheduleController extends Controller
 
         return response()->json($agent, 201);
     }
+
+    public function getWorkScheduleByQueueId($id)
+    {
+
+        $startDate = now()->startOfWeek();
+        $endDate = now()->endOfWeek();
+        $workSchedule = $this->workScheduleService->getWorkScheduleByQueueId($id, $startDate, $endDate);
+
+        return response()->json($workSchedule, 200);
+    }
 }

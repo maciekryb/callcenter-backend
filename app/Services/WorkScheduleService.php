@@ -12,6 +12,19 @@ use App\Models\WorkSchedule;
 class WorkScheduleService
 {
 
+
+    public function getWorkScheduleByQueueId($id, $startDate, $endDate)
+    {
+        // Pobierz grafik agentów dla danej kolejki po id
+        $workSchedule = WorkSchedule::where('queue_id', $id)
+            ->whereBetween('date', [$startDate, $endDate])
+            ->get();
+
+            logger($workSchedule);
+        return $workSchedule;
+    }
+
+
     // Pobierz prognozy połączeń na dany dzień (dla każdej godziny).
     // Pobierz agentów obsługujących tę kolejkę (z efektywnością).
     // Pobierz dostępność tych agentów na dany dzień.
