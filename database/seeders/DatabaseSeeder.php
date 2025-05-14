@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
             QueueSeeder::class,
             WorkLoadPredictionSeeder::class,
         ]);
-        Agent::factory()->withQueues()->count(10)->create();
+        Agent::factory()->withQueues()->count(20)->create();
 
         $this->call(AgentAvailabilitySeeder::class);
     }
