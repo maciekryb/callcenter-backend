@@ -17,7 +17,7 @@ class AgentController extends Controller
             'email' => 'required|email|unique:agents,email',
             'queues' => 'required|array',
             'queues.*.name' => 'required|string|exists:queues,name',
-            'queues.*.efficiency' => 'required|numeric|min:0|max:100',
+            'queues.*.efficiency' => 'required|numeric|min:1|max:100',
         ]);
 
         $agent = $this->agentService->createAgentWithQueues($validated);
