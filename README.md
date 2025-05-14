@@ -1,4 +1,4 @@
-# System Zarządzania Grafikiem
+# System Zarządzania Grafikiem (Backend)
 
 ## Opis projektu
 
@@ -113,7 +113,7 @@ Stworzone endpointy (patrz `routes/api.php`).
 ## Frontend
 
 Projekt frontendowy znajduje się w osobnym repozytorium i został zbudowany w technologii **React + Vite + Tailwind CSS**.
-- **Repozytorium:** `<adres-repo-frontend>`
+- **Repozytorium:** `<https://github.com/maciekryb/callcenter-frontend>`
 - **Instrukcja uruchomienia:** patrz README w repozytorium frontendu
 
 Frontend komunikuje się z backendem przez powyższe endpointy REST API.
